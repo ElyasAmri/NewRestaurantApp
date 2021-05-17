@@ -5,26 +5,28 @@
  */
 
 import * as Linking from 'expo-linking';
+import {LinkingOptions} from "@react-navigation/native";
 
-export default {
-  prefixes: [Linking.makeUrl('/')],
-  config: {
-    screens: {
-      Root: {
+const linkingOptions : LinkingOptions =
+    {
+      prefixes: [Linking.makeUrl('/')],
+      config: {
+        initialRouteName: "Menu",
         screens: {
-          TabOne: {
+          Root: {
             screens: {
-              TabOneScreen: 'one',
+              MenuTab: {
+                screens: {
+                  MenuScreen: 'Menu',
+                  ItemScreen: 'Item',
+                  CheckoutScreen: 'Checkout'
+                }
+              },
             },
           },
-          TabTwo: {
-            screens: {
-              TabTwoScreen: 'two',
-            },
-          },
+          NotFound: '*',
         },
       },
-      NotFound: '*',
-    },
-  },
-};
+    }
+
+export default {...linkingOptions}

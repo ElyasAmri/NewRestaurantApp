@@ -8,6 +8,7 @@ import { Text as DefaultText, View as DefaultView } from 'react-native';
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
+import {invertColor} from "../utilities/ColorUtility";
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
@@ -43,4 +44,11 @@ export function View(props: ViewProps) {
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+}
+
+export function BorderedView(props: ViewProps) {
+  const { style, lightColor, darkColor, ...otherProps } = props;
+  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
+  const borderColor = invertColor(backgroundColor);
+  return <DefaultView style={[{ backgroundColor }, { borderColor }, style]} {...otherProps} />;
 }
