@@ -1,24 +1,46 @@
-//import React from "react"
+import { useEffect, useState } from "react"
+import { Item } from "../types";
+import Constants from "expo-constants";
 
-export default function useLoadItems(){
-  //const [items, setItems] = React.useState<Item[]>(init)
+export default function useLoadItems(repeatRef: number) : [Item[], boolean, boolean] {
+  const [items, setItems] = useState<Item[]>([])
+  const [isLoading, setIsLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
 
-  return [
-    {id:0, name: "item0", imageUrl: "None", price: 0.01},
-    {id:1, name: "item1", imageUrl: "None", price: 1.11},
-    {id:2, name: "item2", imageUrl: "None", price: 2.21},
-    {id:3, name: "item3", imageUrl: "None", price: 3.31},
-    {id:4, name: "item4", imageUrl: "None", price: 4.41},
-    {id:5, name: "item5", imageUrl: "None", price: 5.51},
-    {id:6, name: "item6", imageUrl: "None", price: 6.61},
-    {id:7, name: "item7", imageUrl: "None", price: 7.71},
-    {id:8, name: "item8", imageUrl: "None", price: 8.81},
-    {id:9, name: "item9", imageUrl: "None", price: 9.91},
-  ];
+  useEffect(() => {
+    (async () => {
+      try{
+        // TODO: refer to env
+        console.log(Constants.manifest.extra)
+        const response = await fetch("http://localhost:8000/api/menu")
+        const jsonString = await response.json();
+        const data = JSON.parse(jsonString);
+        setItems(data);
+      }
+      catch (e) {
+        // console.warn(e)
+        // TODO: Use cache
+        setFailed(true);
+      }
+      finally {
+        setIsLoading(false)
+      }
 
-  // React.useEffect(() => {
-  //
-  // }, [])
+      // setItems([
+      //   {"id":0, "name": "item0", "imageUrl": "None", "price": 0.01, "limitCount": 20},
+      //   {"id":1, "name": "item1", "imageUrl": "None", "price": 1.11, "limitCount": 20},
+      //   {"id":2, "name": "item2", "imageUrl": "None", "price": 2.21, "limitCount": 20},
+      //   {"id":3, "name": "item3", "imageUrl": "None", "price": 3.31, "limitCount": 5},
+      //   {"id":4, "name": "item4", "imageUrl": "None", "price": 4.41, "limitCount": 5},
+      //   {"id":5, "name": "item5", "imageUrl": "None", "price": 5.51, "limitCount": 5},
+      //   {"id":6, "name": "item6", "imageUrl": "None", "price": 6.61, "limitCount": 2},
+      //   {"id":7, "name": "item7", "imageUrl": "None", "price": 7.71, "limitCount": 2},
+      //   {"id":8, "name": "item8", "imageUrl": "None", "price": 8.81, "limitCount": 2},
+      //   {"id":9, "name": "item9", "imageUrl": "None", "price": 9.91, "limitCount": 2},
+      //   {"id":10, "name": "item10", "imageUrl": "None", "price": 90.91, "limitCount": 2}
+      // ]);
+    })();
+    }, [repeatRef])
 
-  //return data;
+  return [items, isLoading, failed];
 }

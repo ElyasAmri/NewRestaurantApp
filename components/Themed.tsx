@@ -4,11 +4,11 @@
  */
 
 import * as React from 'react';
-import { Text as DefaultText, View as DefaultView } from 'react-native';
+import {StyleSheet, Text as DefaultText, TextStyle, View as DefaultView} from 'react-native';
+import * as TableComponent from "react-native-table-component";
 
 import Colors from '../constants/Colors';
 import useColorScheme from '../hooks/useColorScheme';
-import {invertColor} from "../utilities/ColorUtility";
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
@@ -29,26 +29,44 @@ type ThemeProps = {
   darkColor?: string;
 };
 
-export type TextProps = ThemeProps & DefaultText['props'];
-export type ViewProps = ThemeProps & DefaultView['props'];
-
-export function Text(props: TextProps) {
+export function Text(props: ThemeProps & DefaultText['props']) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
   return <DefaultText style={[{ color }, style]} {...otherProps} />;
 }
 
-export function View(props: ViewProps) {
+export function View(props: ThemeProps & DefaultView['props']) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
 }
 
-export function BorderedView(props: ViewProps) {
+export function BorderedView(props: ThemeProps & DefaultView['props']) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
-  const borderColor = invertColor(backgroundColor);
+  const borderColor = useThemeColor({ light: lightColor, dark: darkColor }, 'border');
   return <DefaultView style={[{ backgroundColor }, { borderColor }, style]} {...otherProps} />;
+}
+
+// export function TextThemed<T extends React.FC>(props: ThemeProps & {Component: T}) {
+//   const { lightColor, darkColor, textStyle, Component, ...otherProps } = props;
+//   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+//   const newTextStyle = StyleSheet.compose<TextStyle>({color}, textStyle as any) as any
+//   return <Component textStyle={newTextStyle} {...otherProps}/>
+// }
+
+export function Row(props: TableComponent.RowProps & ThemeProps){
+  const { lightColor, darkColor, textStyle, ...otherProps } = props;
+  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const newTextStyle = StyleSheet.compose<TextStyle>({color}, textStyle as any) as any
+  return <TableComponent.Row textStyle={newTextStyle} {...otherProps}/>
+}
+
+export function Rows(props: TableComponent.RowsProps & ThemeProps){
+  const { lightColor, darkColor, textStyle, ...otherProps } = props;
+  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const newTextStyle = StyleSheet.compose<TextStyle>({color}, textStyle as any) as any
+  return <TableComponent.Rows textStyle={newTextStyle} {...otherProps}/>
 }

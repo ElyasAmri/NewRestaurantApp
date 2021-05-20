@@ -1,14 +1,14 @@
 {
   "expo": {
     "name": "NewRestaurantApp",
-    "slug": "NewRestaurantApp",
-    "version": "1.0.0",
+    "slug": "new-restaurant-app",
+    "version": "0.4.4",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "icon": "./assets/expo/images/icon.png",
+    "scheme": "nra",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/expo/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -23,12 +23,17 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/expo/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "versionCode": 72
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/expo/images/favicon.png"
+    },
+    "extra": {
+      "app_env": "local",
+      "menu_fetch_url": "http://localhost:8000/api/menu"
     }
   }
 }

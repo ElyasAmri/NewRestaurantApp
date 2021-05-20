@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import {StyleSheet, DeviceEventEmitter} from "react-native";
 import {Text, View} from '../components/Themed';
-import {NavigationProp, SubOrder} from "../types";
+import {MenuStackNavigationParamList} from "../types";
 import Stepper from "../components/Stepper";
 import {Button} from "../components/Modified";
+import {StackScreenProps} from "@react-navigation/stack";
 
 
-export default function ItemScreen(props: NavigationProp<SubOrder>) {
+export default function ItemScreen(props: StackScreenProps<MenuStackNavigationParamList, "Item">) {
   const navigation = props.navigation;
   const item = props.route.params.item;
   const [count, setCount] = useState(props.route.params.count);
@@ -22,7 +23,7 @@ export default function ItemScreen(props: NavigationProp<SubOrder>) {
         <Text>{item.name}</Text>
         <Text>{item.imageUrl}</Text>
         <Text>{item.price}</Text>
-        <Stepper initCount={count} onValueChanged={setCount}/>
+        <Stepper initCount={count} max={item.limitCount} onValueChanged={setCount}/>
         <View style={styles.actionsContainer}>
           <Button title="Back" onPress={navigation.goBack}/>
           <Button title="Add" onPress={add}/>

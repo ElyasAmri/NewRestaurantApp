@@ -1,61 +1,59 @@
-import React, {useState} from 'react';
-import {Button, DeviceEventEmitter, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
-import { Text, View } from "../components/Themed";
+import React, {useEffect, useReducer, useRef } from 'react';
+import {Button, DeviceEventEmitter, FlatList, StyleSheet } from 'react-native';
+import { Text, View, BorderedView as BView } from "../components/Themed";
 import useLoadItems from "../hooks/useLoadItems";
-import {Item, NavigationProp, SubOrder} from "../types";
-import { useNavigation } from "@react-navigation/native";
+import { MenuStackNavigationParamList, SubOrder } from "../types";
+import {StackScreenProps} from "@react-navigation/stack";
+import MenuItem from "../components/MenuItem";
 
-export default function MenuScreen({navigation}: NavigationProp<any>) {
-  const data = useLoadItems();
-  let initOrder: SubOrder[] = [];
 
-  for (let i = 0; i < data.length; i++) {
-    initOrder[i] = {item: data[i], count: 0}
-  }
+export default function MenuScreen({navigation}: StackScreenProps<MenuStackNavigationParamList>) {
+  const orderRef = useRef<SubOrder[]>([]);
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const [shouldRefresh, refresh] = useReducer(x => x + 1, 0);
+  const [data, isLoading, failed] = useLoadItems(shouldRefresh);
 
-  const [order, setOrder] = useState(initOrder);
+  useEffect(() => {
+    if(failed) return;
+    orderRef.current = data.map((e, i) => orderRef.current[i] ?? {item: e, count: 0});
+    forceUpdate();
+  }, [shouldRefresh])
 
   const onOrderUpdated = ({item, count}: SubOrder) => {
-    let newOrder = [...order];
-    newOrder[item.id] = {item: item, count: count}
-    setOrder(newOrder);
-  }
+    orderRef.current[item.id] = {item: item, count: count}
+    forceUpdate();
+  };
 
-  DeviceEventEmitter.removeAllListeners('order.update');
-  DeviceEventEmitter.addListener('order.update', onOrderUpdated);
+  useEffect(() => {
+    refresh();
+    DeviceEventEmitter.removeAllListeners('order.update');
+    DeviceEventEmitter.addListener('order.update', onOrderUpdated);
+  }, [])
+
+  const isCheckoutDisabled = !orderRef.current.some((item: SubOrder) => item.count > 0);
 
   return (
       <View style={styles.container}>
-        <View style={styles.listContainer}>
-          <FlatList data={order}
-                    extraData={order}
+        <Text style={{alignSelf: "center"}}>New Restaurant App</Text>
+        <BView style={styles.listContainer}>
+          <FlatList data={orderRef.current}
+                    extraData={shouldRefresh}
                     renderItem={({item} : any) => <MenuItem item={item.item} count={item.count}/>}
-                    keyExtractor={(item) => item.item.id.toString()}/>
+                    keyExtractor={(item) => item.item.id.toString()}
+                    onRefresh={() => refresh()} refreshing={isLoading}/>
+        </BView>
+        {failed &&
+        <View style={styles.error}>
+            <Text style={styles.errorText}>Error: couldn't get menu from server.</Text>
+            <Text style={styles.errorText}>Pull down to refresh. (error count: {shouldRefresh})</Text>
+
         </View>
-        <View>
-          <Button title="Checkout" onPress={() => navigation.navigate("Checkout")}/>
-        </View>
+        }
+        <Button title="Checkout"
+                disabled={isCheckoutDisabled}
+                onPress={() => navigation.navigate("Checkout", orderRef.current)}/>
       </View>
   );
-}
-
-function MenuItem(props: SubOrder) {
-  const navigation = useNavigation();
-  const {item, count} = props;
-
-  //style={styles.itemContainer}
-  return (
-      <View lightColor={"#f6f6f6"} darkColor={"#262626"} style={styles.itemContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate("Item", {item: item, count: count})}>
-          <Text>{item.id}</Text>
-          <Text>{item.name}</Text>
-          <Text>{item.imageUrl}</Text>
-          <Text>{item.price}</Text>
-          <Text>{count}</Text>
-          <Text>Added: {count > 0 ? "true" : "false"}</Text>
-        </TouchableOpacity>
-      </View>
-      );
 }
 
 const styles = StyleSheet.create({
@@ -64,16 +62,23 @@ const styles = StyleSheet.create({
   },
 
   listContainer: {
-    borderWidth: 1,
-    padding: 5,
-    borderRadius: 10,
-    flex: 1
-  },
-
-  itemContainer: {
     flex: 1,
+    flexDirection: "column",
+    borderWidth: 1,
     borderRadius: 10,
-    marginVertical: 2,
-    padding: 4
+    padding: 10,
+    margin: 5
+  },
+  errorText: {
+
+    textAlign: "center",
+    //textAlignVertical: "center",
+  },
+  error: {
+    flex: 1,
+    position: "absolute",
+    top: "50%",
+    alignSelf: "center",
   }
+
 });
