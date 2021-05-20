@@ -8,7 +8,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     extra: {
       ...extra,
       app_env: "local",
-      menu_fetch_url: "http://localhost:8000/api/menu"
+      menu_fetch_url: "https://intex.ga/api/menu"
     },
     ...rest
   }

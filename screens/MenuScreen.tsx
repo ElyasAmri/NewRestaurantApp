@@ -8,6 +8,8 @@ import MenuItem from "../components/MenuItem";
 
 
 export default function MenuScreen({navigation}: StackScreenProps<MenuStackNavigationParamList>) {
+  // TODO: modify the state so that it only takes itemID and count
+  // Should pass a global data between screens
   const orderRef = useRef<SubOrder[]>([]);
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   const [shouldRefresh, refresh] = useReducer(x => x + 1, 0);

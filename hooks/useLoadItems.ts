@@ -11,14 +11,13 @@ export default function useLoadItems(repeatRef: number) : [Item[], boolean, bool
     (async () => {
       try{
         // TODO: refer to env
-        console.log(Constants.manifest.extra)
-        const response = await fetch("http://localhost:8000/api/menu")
+        const response = await fetch(Constants.manifest.extra?.menu_fetch_url)
         const jsonString = await response.json();
         const data = JSON.parse(jsonString);
         setItems(data);
       }
       catch (e) {
-        // console.warn(e)
+        console.warn(e)
         // TODO: Use cache
         setFailed(true);
       }
