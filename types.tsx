@@ -16,7 +16,7 @@ export type SidebarDrawerParamList = {
 export type MenuStackNavigationParamList = {
   Menu: undefined,
   Item: SubOrder,
-  Checkout: SubOrder[]
+  Checkout: Order
 }
 
 export type SubOrder = {
@@ -24,10 +24,14 @@ export type SubOrder = {
   count: number
 }
 
+export type Order = {
+  [id: string]: SubOrder
+}
+
 export type Item = {
-  id: number
+  id: string
   name: string,
-  imageUrl: string,
+  imageUrl: any,
   price: number,
   limitCount: number
 }

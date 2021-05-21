@@ -2,7 +2,7 @@
   "expo": {
     "name": "NewRestaurantApp",
     "slug": "new-restaurant-app",
-    "version": "0.4.4",
+    "version": "0.9.1",
     "orientation": "portrait",
     "icon": "./assets/expo/images/icon.png",
     "scheme": "nra",
@@ -26,14 +26,13 @@
         "foregroundImage": "./assets/expo/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 72
+      "versionCode": 90
     },
     "web": {
       "favicon": "./assets/expo/images/favicon.png"
     },
     "extra": {
-      "app_env": "local",
-      "menu_fetch_url": "https://intex.ga/api/menu"
+      "env": "local"
     }
   }
 }

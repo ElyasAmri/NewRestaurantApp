@@ -1,26 +1,36 @@
-import React from 'react';
-import {Alert, StyleSheet} from "react-native";
+import React, {useState} from 'react';
+import {ActivityIndicator, Alert, StyleSheet} from "react-native";
 import { Button } from "../components/Modified";
 import {View, Text, BorderedView as BView, Rows, Row} from "../components/Themed";
 import { MenuStackNavigationParamList, RootStackParamList, SubOrder} from "../types";
 import { RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack/src/types";
 import { Table, TableWrapper } from 'react-native-table-component';
+import {format, toArray} from "../helpers";
+import Parse from "parse/react-native"
 
 type Props = {
   navigation: StackNavigationProp<RootStackParamList, "Root">;
   route: RouteProp<MenuStackNavigationParamList, "Checkout">;
 }
 
-const format = (value: number) => "$" + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 const itemTotalPrice = (item: SubOrder) => item.item.price * item.count;
 
 
 export default function CheckoutScreen({navigation, route}: Props) {
-  const data = route.params.filter((e) => e.count > 0);
+  const data: SubOrder[] = toArray(route.params).filter((e) => e.count > 0);
   const totalPrice = format(data.reduce((acc, p) => acc + itemTotalPrice(p), 0));
+  const [animating, setAnimating] = useState(false);
 
-  const onPressedPay = () => {
+  const onPressedPay = async () => {
+    setAnimating(true);
+    const order = new Parse.Object("Order");
+
+    order.set('sub_orders', data.map((e) => ({item: e.item.id, count: e.count})));
+    order.set('success', true);
+
+    await order.save();
+
     Alert.alert("Payment Successful", "Payed " + totalPrice);
     navigation.replace("Root");
   }
@@ -35,10 +45,10 @@ export default function CheckoutScreen({navigation, route}: Props) {
       <View style={[styles.flex, styles.screen]}>
           <View style={table.container}>
             <Table>
-              <Row textStyle={table.headText} style={table.head} data={['ID', 'Name', 'Price', 'Count', 'Total']}/>
+              <Row textStyle={table.headText} flexArr={[1.5, 1, 1, 1, 1]} style={table.head} data={['ID', 'Name', 'Price', 'Count', 'Total']}/>
               <TableWrapper style={table.wrapper}>
                 <Rows data={rows}
-                      flexArr={[1, 1, 1, 1, 1]}
+                      flexArr={[1.5, 1, 1, 1, 1]}
                       style={table.row}
                       textStyle={table.text} />
               </TableWrapper>
@@ -50,8 +60,9 @@ export default function CheckoutScreen({navigation, route}: Props) {
         </View>
         <BView style={styles.actions}>
           <Button title={"Back"} onPress={navigation.goBack}/>
-          <Button title={"Pay"} onPress={onPressedPay}/>
+          <Button title={"Pay"} onPress={() => onPressedPay()}/>
         </BView>
+        <ActivityIndicator style={styles.loadingIndicator} color={"blue"} animating={animating} size="large"/>
       </View>
   );
 }
@@ -96,6 +107,11 @@ const styles = StyleSheet.create({
     textAlignVertical: "bottom"
   },
 
+  loadingIndicator: {
+    position: "absolute",
+    alignSelf: "center",
+    top: "50%"
+  }
 });
 
 const table = StyleSheet.create({

@@ -1,19 +1,23 @@
+import React, {useEffect, useState} from "react";
 import {SubOrder} from "../types";
 import {useNavigation} from "@react-navigation/native";
-import {Button, DeviceEventEmitter, StyleSheet, TouchableOpacity} from "react-native";
+import {Button, DeviceEventEmitter, Image, StyleSheet, TouchableOpacity} from "react-native";
 import {Text, View, BorderedView as BView} from "./Themed";
-import React from "react";
 
 export default function MenuItem(props: SubOrder) {
   const navigation = useNavigation();
   const {item, count} = props;
-  // TODO: use imageUrl
   // noinspection JSUnusedLocalSymbols
   const { name, imageUrl, price} = item;
   const added = count > 0;
   const addedColor = "#349334";
   const lightColor = added ? addedColor : "#f6f6f6";
   const darkColor = added ? addedColor : "#262626";
+  const [image, setImage] = useState<string>("");
+
+  useEffect(() => {
+    if(imageUrl) setImage(imageUrl.url());
+  }, [imageUrl])
 
   const onRemove = () => {
     DeviceEventEmitter.emit('order.update', {item: item, count: 0});
@@ -30,7 +34,13 @@ export default function MenuItem(props: SubOrder) {
         <TouchableOpacity style={styles.touchable}
                           onPress={() => navigation.navigate("Item", {item: item, count: count})}>
           <Text style={styles.name}>{name}</Text>
-          <BView style={styles.image}/>
+          <BView style={styles.image}>
+            {image != "" &&
+              <Image style={{flex: 1}} source={
+                {uri: image}
+              }/>
+            }
+          </BView>
           <Text style={styles.price}>{price}</Text>
         </TouchableOpacity>
         {added ? remove : <></> }
