@@ -13,7 +13,7 @@ export default function MenuScreen({navigation}: StackScreenProps<MenuStackNavig
 
   useEffect(() => {
     if(failed) {
-      // return;
+      return;
     }
     const next = items.map((e, i) => orderRef.current[i.toString()] ?? {item: e, count: 0});
     for (let i = 0; i < next.length; i++) {
